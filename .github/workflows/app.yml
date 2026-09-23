@@ -1,0 +1,40 @@
+# This file builds your Android app automatically every time you push code.
+# Save this file at: .github/workflows/app.yml  (note: "workflows" is plural)
+
+name: Build App
+
+# Run this every time you push to GitHub, or when you click "Run workflow" manually
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download your code
+      - uses: actions/checkout@v4
+
+      # Step 2: Install Java (needed to build Android apps)
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Step 3: Install the Android build tools
+      - uses: android-actions/setup-android@v3
+
+      # Step 4: Install Gradle (the tool that actually builds the app)
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+
+      # Step 5: Build the app (creates the APK file)
+      - run: gradle assembleDebug
+
+      # Step 6: Save the APK so you can download it from the Actions tab
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: app/build/outputs/apk/debug/app-debug.apk
